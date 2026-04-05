@@ -1,16 +1,108 @@
-# React + Vite
+# Drone Log Analyzer (DLA) 🚁
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Drone Log Analyzer (DLA)** — це сучасний веб-інтерфейс для детального аналізу телеметрії та діагностики логів польоту безпілотних апаратів (БПЛА). Додаток парсить дані (які передані від бекенду), візуалізує траєкторію в інтерактивному 3D-просторі (ENU), будує графіки швидкості та висоти, використовує алгоритми "AI-аналітика" для виявлення аномалій і дозволяє експортувати результати у професійний векторний **PDF-звіт**.
 
-Currently, two official plugins are available:
+Проєкт побудований на **React**, оптимізований збіркою **Vite** та використовує **Plotly.js** і **Recharts** для відмальовування графіки.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🚀 Локальний запуск (Frontend)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Для успішного запуску вам знадобиться встановлений [Node.js](https://nodejs.org/en/) (версія 18+).
 
-## Expanding the ESLint configuration
+### 1. Клонування репозиторію
+Відкрийте термінал і виконайте команду:
+```bash
+git clone <url-вашого-репозиторію>
+cd my-react-app
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2. Встановлення залежностей
+```bash
+npm install
+```
+
+### 3. Запуск сервера розробки
+```bash
+npm run dev
+```
+Після цього додаток буде доступний за адресою: `http://localhost:5173`.
+
+### 4. Збірка для продакшену (опціонально)
+Для підготовки мініфікованих файлів до деплою:
+```bash
+npm run build
+```
+
+---
+
+## 🔌 API Інтеграція (Зв'язок Frontend ↔ Backend)
+
+Фронтенд взаємодіє з бекенд-сервером через REST API. Коли користувач завантажує файл `.BIN` (або інший лог), додаток відправляє `POST` запит з `FormData` (де ключ `file` містить сам бінарний файл) на ендпоінт аналізу.
+
+- **Ендпоінт за замовчуванням:** `POST http://localhost:8000/analyze`
+- **Content-Type:** `multipart/form-data`
+
+### 🔄 Очікуваний формат відповіді (JSON Response)
+Бекенд-парсер (наприклад, написаний на Python / pymavlink) після розшифровки логу повинен повернути відповідь чітко у такому форматі:
+
+```json
+{
+  "status": "success",
+  "mission_analysis": {
+    "mission_status": "Crash",
+    "anomalies": [
+      "Удар: Зафіксовано перевантаження (55.2 м/с²) на 142.1 секунді.",
+      "Бортовий журнал: EKF3 variance"
+    ]
+  },
+  "data": {
+    "metrics": {
+      "flight_duration_sec": 125.4,
+      "total_distance_m": 4500.2,
+      "max_altitude_m": 580.5,
+      "max_horizontal_speed_m_s": 25.4,
+      "max_vertical_speed_m_s": -15.2,
+      "max_acceleration_m_s2": 55.2
+    },
+    "trajectory": {
+      "time": [0.0, 0.2, 0.4, 0.6],        // Масив часу в секундах
+      "x_east": [0.0, 1.5, 3.2, 4.8],      // Схід (Смещение відносно старту)
+      "y_north": [0.0, -0.5, -1.2, -1.5],  // Північ 
+      "z_up": [0.0, 0.2, 0.5, 0.8],        // Висота (Alt)
+      "speed_m_s": [0.0, 7.5, 12.2, 15.0]  // Поточна швидкість у момент часу
+    }
+  }
+}
+```
+
+> **Важливо:** Якщо `mission_analysis` та `speed_m_s` не будуть надані сервером, фронтенд їх обчислить чи зімітує на основі масивів координат і часу в `trajectory`.
+
+### 🚥 Очікувані HTTP Статус Коди
+
+Фронтенд правильно обробляє наступні коди від сервера:
+
+- `200 OK` — Файл успішно проаналізовано, JSON-дані вірні, рендериться Дашборд.
+- `400 Bad Request` — Файл не відправлено, або він пошкоджений (наприклад, не є `.BIN` форматом). *Виводиться повідомлення: "Некоректний формат файлу".*
+- `413 Payload Too Large` — Лог-файл занадто великий для обробки бекендом. *Виводиться відповідна помилка.*
+- `500 Internal Server Error` — Помилка парсингу (наприклад, Exception у скрипті бібліотеки на парсинг). Фронтенд зловить повідомлення з тіла `response.message` і покаже червоний або жовтий Alert у інтерфейсі.
+
+*(Примітка: Якщо бекенд тимчасово "лежить" або недоступний (`Failed to fetch` / `CORS Error`), застосунок на фронтенді має вбудовану логіку відкоту до фейкових заглушок - Mock Data, щоб дозволити вам тестувати UI).*
+
+---
+
+## 🏗️ Структура Проєкту
+
+- `src/pages/FlightDashboard.jsx` — Головний контейнер додатка. Включає в себе виклики та менеджмент стану всіх компонентів екрану.
+- `src/components/` — Секція для ізольованих модулів:
+  - `Flight3D.js` — Тривимірне полотно та налаштування для Plotly JS.
+  - `TelemetryCharts.jsx` — Генератор 2D лінійних графіків висоти та прискорення.
+  - `AIAssistantPanel.jsx` — Віджети з результатами та аналітичними підказками.
+  - `PlaybackSlider.jsx` — Таймлайн-повзунок для взаємодії з 3D.
+- `src/utils/` — Логіка, відділена від UI:
+  - `pdfExport.js` — Просунута технологія генерації стилізованого PDF-звіту через `jsPDF`.
+  - `api.js` — Точка комунікації (REST Fetch) та валідація формату бекенду.
+  - `mathUtils.js` — Фізичні розрахунки перевантажень і швидкості через вектори і час.
+
+---
+*Розроблено спеціально для візуалізації і аналізу Drone Телеметрії* ✨

@@ -70,7 +70,7 @@ export default function AIAssistantPanel({ metrics, trajectory }) {
       if (!text) throw new Error("Порожня відповідь від API");
       setReport(text);
       setGenerated(true);
-    } catch (err) {
+    } catch {
       setError("Не вдалося отримати звіт. Перевірте підключення.");
     } finally {
       setLoading(false);

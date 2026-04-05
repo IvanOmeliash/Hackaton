@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MONO } from '../../utils/constants';
 
+// eslint-disable-next-line no-unused-vars
 export default function StatCard({ icon: Icon, label, value, unit, color, delay = 0 }) {
   const [vis, setVis] = useState(false);
   const [hov, setHov] = useState(false);

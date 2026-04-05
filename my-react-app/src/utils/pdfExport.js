@@ -190,7 +190,6 @@ export async function exportToPDF(fileName, metrics, trajectory) {
 
   doc.setFont("Roboto", "normal"); doc.setFontSize(8); doc.setTextColor(203, 213, 225);
   const tableStep = Math.max(1, Math.floor(trajectory.time.length / 25));
-  let v_prev = 0;
 
   for (let i = 0; i < trajectory.time.length; i += tableStep) {
     if (y > H - M) {

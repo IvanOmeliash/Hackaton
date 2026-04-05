@@ -49,7 +49,7 @@ export default function UploadScreen({ onAnalyzed }) {
     try {
       const response = await callApi(file);
       onAnalyzed(file.name, response);
-    } catch (err) {
+    } catch {
       setError("Помилка аналізу. Спробуйте ще раз.");
       setAnalyzing(false);
     }

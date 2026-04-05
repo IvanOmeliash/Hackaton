@@ -5,7 +5,7 @@ export async function callApi(file) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch('http://localhost:8000/analyze', {
+    const response = await fetch('http://localhost:8080/api/flights/upload', {
       method: 'POST',
       body: formData,
     });

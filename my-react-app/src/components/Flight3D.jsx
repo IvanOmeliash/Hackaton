@@ -88,11 +88,11 @@ export default function Flight3D({ trajectory, plotlyReady, playbackIndex }) {
     }, { displayModeBar: true, displaylogo: false, modeBarButtonsToRemove: ["toImage", "sendDataToCloud"], responsive: true });
 
     hasPlotted.current = true;
-  }, [trajectory, plotlyReady]);
+  }, [trajectory, plotlyReady, playbackIndex]);
 
   useEffect(() => {
     if (!hasPlotted.current || !window.Plotly || !trajectory || playbackIndex == null) return;
-    const { time, x_east, y_north, z_up } = trajectory;
+    const { x_east, y_north, z_up } = trajectory;
     const i = playbackIndex;
     window.Plotly.restyle(divRef.current, {
       x: [[x_east[i]]],

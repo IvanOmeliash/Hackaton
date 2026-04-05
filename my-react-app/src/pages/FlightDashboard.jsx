@@ -16,7 +16,7 @@ import MetricsGrid from '../components/MetricsGrid';
 import TelemetryCharts from '../components/TelemetryCharts';
 import DashboardFooter from '../components/DashboardFooter';
 
-export default function FlightDashboard({ fileName = "mission_042.BIN", apiResponse = null, onBack }) {
+export default function FlightDashboard({ fileName = "mission_042.BIN", apiResponse = null, onBack, onAccount }) {
   const [plotlyReady, setPlotlyReady] = useState(!!window.Plotly);
   const [playbackIndex, setPlaybackIndex] = useState(null);
   const [pdfExporting, setPdfExporting] = useState(false);
@@ -27,7 +27,7 @@ export default function FlightDashboard({ fileName = "mission_042.BIN", apiRespo
     s.src = "https://cdn.jsdelivr.net/npm/plotly.js-dist@2.27.0/plotly.min.js";
     s.onload = () => setPlotlyReady(true);
     document.head.appendChild(s);
-    return () => { try { document.head.removeChild(s); } catch (_) { } };
+    return () => { try { document.head.removeChild(s); } catch { /* ignore cleanup error */ } };
   }, []);
 
   const response = apiResponse || generateMockResponse();
@@ -72,6 +72,7 @@ export default function FlightDashboard({ fileName = "mission_042.BIN", apiRespo
         fileName={fileName}
         pdfExporting={pdfExporting}
         onExportPDF={handleExportPDF}
+        onAccount={onAccount}
       />
       <div style={{ flex: 1, padding: "18px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
         <SectionLabel text="Ключові показники польоту" gradient="linear-gradient(180deg,#3b82f6,#0ea5e9)" />

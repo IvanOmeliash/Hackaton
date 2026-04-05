@@ -1,5 +1,6 @@
 import { MONO } from '../../utils/constants';
 
+// eslint-disable-next-line no-unused-vars
 export default function Panel({ title, icon: Icon, color = "#60a5fa", children, style = {} }) {
   return (
     <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.055)", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", ...style }}>

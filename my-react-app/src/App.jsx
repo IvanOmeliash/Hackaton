@@ -1,22 +1,44 @@
 import { useState } from "react";
+import { useAuth } from "./hooks/useAuth";
+import LoginScreen from "./components/LoginScreen";
 import UploadScreen from "./components/UploadScreen";
 import FlightDashboard from "./pages/FlightDashboard";
+import AccountPage from "./pages/AccountPage";
+import "./App.css";
 
-export default function DroneLogAnalyzer() {
-  const [screen, setScreen] = useState("upload"); // "upload" | "dashboard"
-  const [fileName, setFileName] = useState("");
+// screens: "upload" | "dashboard" | "account"
+export default function App() {
+  const { token, login, logout } = useAuth();
+  const [screen, setScreen]       = useState("upload");
+  const [fileName, setFileName]   = useState("");
   const [apiResponse, setApiResponse] = useState(null);
+
+  if (!token) {
+    return <LoginScreen onLogin={login} />;
+  }
+
+  if (screen === "account") {
+    return (
+      <AccountPage
+        onBack={() => setScreen("upload")}
+        onLogout={() => { logout(); setScreen("upload"); }}
+        // Called after GET /my-logs/:id succeeds
+        onOpenDashboard={(name, response) => {
+          setFileName(name);
+          setApiResponse(response);
+          setScreen("dashboard");
+        }}
+      />
+    );
+  }
 
   if (screen === "dashboard") {
     return (
       <FlightDashboard
         fileName={fileName}
         apiResponse={apiResponse}
-        onBack={() => {
-          setScreen("upload");
-          setFileName("");
-          setApiResponse(null);
-        }}
+        onBack={() => setScreen("upload")}
+        onAccount={() => setScreen("account")}
       />
     );
   }
@@ -28,6 +50,8 @@ export default function DroneLogAnalyzer() {
         setApiResponse(response);
         setScreen("dashboard");
       }}
+      onLogout={logout}
+      onAccount={() => setScreen("account")}
     />
   );
 }

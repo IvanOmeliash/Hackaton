@@ -1,7 +1,7 @@
 import { User, ChevronLeft, Download, Loader, CheckCircle } from 'lucide-react';
 import { MONO } from '../utils/constants';
 
-export default function DashboardNavbar({ onBack, fileName, pdfExporting, onExportPDF }) {
+export default function DashboardNavbar({ onBack, fileName, pdfExporting, onExportPDF, onAccount }) {
   return (
     <nav style={{
       display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "space-between",
@@ -26,6 +26,7 @@ export default function DashboardNavbar({ onBack, fileName, pdfExporting, onExpo
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+
         {/* PDF Export Button */}
         <button
           onClick={onExportPDF}
@@ -44,6 +45,8 @@ export default function DashboardNavbar({ onBack, fileName, pdfExporting, onExpo
             : <><Download size={11} /> Завантажити звіт PDF</>
           }
         </button>
+
+        {/* Analysis badge */}
         <div style={{
           display: "flex", alignItems: "center", gap: 7,
           background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.18)",
@@ -52,14 +55,37 @@ export default function DashboardNavbar({ onBack, fileName, pdfExporting, onExpo
           <CheckCircle size={10} color="#22c55e" />
           <span style={{ fontSize: 10, color: "#22c55e", letterSpacing: "0.05em" }}>АНАЛІЗ ЗАВЕРШЕНО</span>
         </div>
-        <span style={{ fontSize: 10, color: "#cbd5e1", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{fileName}</span>
-        <button style={{
-          width: 32, height: 32, borderRadius: "50%",
-          background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-          display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+
+        {/* File name */}
+        <span style={{
+          fontSize: 10, color: "#cbd5e1", maxWidth: 140,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>
+          {fileName}
+        </span>
+
+        {/* Account button */}
+        <button
+          onClick={onAccount}
+          title="Мій акаунт"
+          style={{
+            width: 32, height: 32, borderRadius: "50%",
+            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", transition: "background 0.2s, border-color 0.2s",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = "rgba(96,165,250,0.1)";
+            e.currentTarget.style.borderColor = "rgba(96,165,250,0.35)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
+          }}
+        >
           <User size={14} color="#cbd5e1" />
         </button>
+
       </div>
     </nav>
   );
